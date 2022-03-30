@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title> Receiver 2 Modding Guide </title>
+		<link rel="stylesheet" href="style.css">
+	</head>
+	<body>
+		<header>
+			<h1> Receiver 2 Gun Modding Guide </h1>
+			<p id="prefix"> Made by Szikaka </p>
+		</header>
+		<main>
+			<section class="point">
+				<h1 class="point-number"> 1 - Downloading </h1>
+
+				<p>
+					So, you want to make a custom gun in Receiver 2? If so, you will have to do some preparation first...
+				</p>
+				<p>
+					First of all, download the modding kit from <a href="https://drive.google.com/file/d/1bNNVMJJDiQSEGQ3tvKLDiZ95J5pMHzP-/view?usp=sharing" target="blank"> Google Drive </a>, and BepInEx from <a href="https://github.com/BepInEx/BepInEx" target="blank"> its github repo</a>.
+				</p>
+				<p>
+					Finished downloading? Good... Let's get to bussiness then.
+				</p>
+			</section>
+
+			<section class="point">
+				<h1 class="point-number"> 2 - Installation </h1>
+
+				<p>
+					Installing BepInEx is rather simple and it was already explained by both <a href="https://docs.bepinex.dev/articles/user_guide/installation/index.html" target="blank"> the official guide </a> as well as Clan Iwan in his mod installation tutorial:
+				</p>
+
+				<iframe src="https://www.youtube.com/embed/xe5f_CwQQVo?start=103" title="YouTube video player" frameborder="0" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen> </iframe>
+
+				<p>
+					It requires a little bit more work to use the modding kit. First, you have to create an Unity account and download <a href="https://unity.com/download" target="blank"> Unity Hub </a>. This will allow you to create asset bundles that are then loaded into the game. <br>
+					After downloading and installing Unity Hub, you'll have to import the modding kit into it. Simply press <span class="background">Open</span> -> <span class="background">Add project from disk</span> and select the modding kit's folder
+				</p>
+
+				<img src="images/Unity Hub.png">
+
+				<p>
+					After importing, try to open the project. Unity Editor should open. If you can, replace <i>Wolfire.Receiver2.dll</i> from DLLs folder with the most recent one from the game files (Receiver 2/Receiver2_Data/Managed).
+				</p>
+
+				<p> After it's done, you can begin work on a new, modded gun. </p>
+			</section>
+
+			<section class="point">
+				<h1 class="point-number"> 3 - Model </h1>
+
+				<p>
+					Before we start the <i> serious </i> modding, we've got to prepare a model. Even at a basic level it dictates what kind of gun you want and how it will operate. <br>
+					You can make a model yourself, download it from sites like <a target="blank" href="https://thangs.com/"> Thangs </a> or <a href="https://grabcad.com/library" target="blank"> GrabCAD</a>, or grab the model from some other game (not recommended).
+				</p>
+
+				<a href="https://poly.pizza/m/52kQzphmeF" target="blank"> 
+					<img src="images/example_pistol.png" title="Pistol by Quaternius [CC0] (https://creativecommons.org/publicdomain/zero/1.0/) via Poly Pizza (https://poly.pizza/m/52kQzphmeF)"> 
+				</a>
+
+				<p>
+					After you've found your model of choice there are a few things to do with it. Model must be aligned with Z axis forward, be separated into meshes for individual parts and include all the necessary materials. Recommended solution is to use Blender and export the model as an .obj file with these options:
+				</p>
+
+				<img src="images/options.png" title="Recommended options for Blender 3.1.0"> <div class="description"> Please note that <span class="background">Axis Forward</span> property may have to change depending on the model </div>
+
+				<p> 
+					You can also tweak the size of a model here using <span class="background">Scale</span> slider. If you don't, you'll always be able to do it directly in Unity Editor;
+				</p>
+			</section>
+
+			<section class="point">
+				<h1 class="point-number"> 4 - Import </h1>
+
+				<p>
+					Now we can import the model into Unity. To make your life easier, I suggest creating a new folder to contain all mod files. You can export the model directly in there, or copy it from elsewhere. If you're using .obj files remember to also copy the .mtl file, as it contains materials used by the mesh.
+				</p>
+
+				<img src="images/copy.png" title="Files copied into Unity">
+
+				<p>
+					First, you must create a gun GameObject. To do it, simply drag the model into the scene. Model will probably be wrong size, but you can always resize it by clicking in in the assets menu and changing the <span class="background"> Scale Factor </span> slider on the top of <span class="background">Inspector</span> menu. After you're done, drag it back to the asset menu to create an <span class="background">Original Object Prefab</span>. You can make a separate folder for storing these prefabs.
+				</p>
+
+				<p>
+					Double click a prefab object to edit it.
+				</p>
+
+				<img src="images/editor.png" title="Unity prefab editor"> <div class="description"> Editor should look somewhat like this </div>
+			</section>
+			
+			<section class="point">
+				<h1 class="point-number"> 5 - Preparing our object </h1>
+				
+
+				<p>
+					We can now start work on the mod proper. <br> 
+					First make sure that the gun is alligned properly, front pointing towards +Z direction. If not, just rotating the model shoud do fine for now. Also confirm that it's the correct size, remembering that squares on the grid are 1m x 1m in size.
+				</p>
+
+				<p> 
+					Next, select the correct layer. All items in the game should be on layer 8, <i>CosmeticPhysics</i>, you can change it via control below object's name in the inspector. Modding kit has that layer pre-built, but you can always add it yourself.
+				</p>
+
+				<img src="images/layer.png" title="Changing a layer">
+
+				<div class="tight">
+					<p>
+						We also have to add some child objects. They are necessary for the gun to function properly:
+					</p>
+	
+					<ul>
+						<li> center_of_mass - Used for RigidBody calculations </li>
+						<li> point_recoil_rotate - Point around which the gun will rotate under recoil </li>
+						<li> point_bullet_fire - Bullets come from here </li>
+						<li> point_muzzleflash - Flashes come from here </li>
+					</ul>
+				</div>
+
+				<img src="images/children.png" title="Four children objects visible to the left, along with the model object">
+
+				<p>
+					Remember to position these objects properly around your model (for example, point_muzzleflash near the muzzle).
+				</p>
+
+				<div class="tight">
+					<p>
+						Next comes probably the most important step, scripts. In the most basic form, a gun requires 3 MonoBehaviour scripts:
+					</p>
+
+					<ul>
+						<li> GunScript - Controlling most aspects of gun's operation </li>
+						<li> InventorySlot - Acts as an anchor for bullets and magazines </li>
+						<li> LevelItem - Used to clear the gun while changing levels during Dreaming </li>
+					</ul>
+				</div>
+
+				<p>
+					These three scripts must be attached to the <span class="background"> root object </span>, one highest in the hierarchy. To do this, select the object then click <span class="background"> Add Component </span>. You sould be able to search for them.
+				</p>
+
+				<img src="images/scripts.png" title="Three added scripts">
+
+				<p>
+					We'll skip GunScript for a bit and focus on the simple ones first.
+				</p>
+
+				<p>
+					The only field we have to set in InventorySlot is the Type enum. We need it to have a value of <i> Gun </i> for it to work properly. <br>
+					And LevelItem doesn't need any form of config, so we'll just leave it as it is.
+				</p>
+
+				<img src="images/slot.png" title="Two configured scripts">
+
+				<p>
+					Now it's time for the meat of 'er - GunScript.
+					At first, its 153 fields can be intimidating. Fortunately, you don't have to fill all of them for your gun to work.
+				</p>
+
+				<div class="tight">
+					<p>
+						Most important fields are:
+					</p>
+
+					<ul>
+						<li> Internal_name - Name of your gun. It's good practice to format it like <span class="background"> Name of the creator/package</span>.<span class="background">Name of the gun </span> </li>
+						<li> Type - Has to do with GunScript's base class, must be set to Gun </li>
+						<li> Colliders - List of colliders connected to the gun. We'll discuss that later </li>
+						<li> Gun_type - Type of gun's action. We'll discuss that later </li>
+						<li> Gun_model - What gun is it. We'll discuss that later </li>
+						<li> Weapon_group_name - Name of weapon's Mall score group, should be the same as Internal_name </li>
+						<li> Is_debug_gun - Whether or not the gun has custom login, should be ticked for now </li>
+						<li> Spawn_info_sprite - Sprite used by the weapon while spawning. Unity's built-in sprites can be used </li>
+					</ul>
+				</div>
+
+				<p>
+					A lot of other fields are also useful, but for now we will focus only on these.
+				</p>
+
+				<p>
+					To add colliders to the gun, it's best to have them on separate objects. You will also need at least one collider to be able to pick it up. To do it, create a child object with a type of collider you want and an <span class="background">Item Collider Owner</span> script attached, then assign GunScript to Item_owner field (simply drag the parent object over).
+				</p>
+
+				<img src="images/collider.png">
+
+				<p>
+					You can then reference it in GunScript by adding it to the Colliders array.
+				</p>
+
+				<img src="images/collideradded.png" title="Current state of your gun">
+
+				<div class="tight">
+					<p>
+						Now for the tricky part - custom enum values. Normally you cannot add enum constants which limits us to only two types of action (Automatic/Revolver) and <span style="text-decoration: line-through;"> 14</span> 9 weapon models. Fortunately, there is a workaround. <br>
+						Modding kit comes equipped with three special scripts:
+					</p>
+
+					<ul>
+						<li> CustomCartridgeType </li>
+						<li> CustomGunModel </li>
+						<li> CustomGunType </li>
+					</ul>
+				</div>
+
+				<p>
+					They can be used to work around the enum limitations. To use them, add them to the object with GunScript and insert a custom value. Gun_model values for mods start at 1000 and can be looked up in the <a href="https://docs.google.com/spreadsheets/d/1J5l3sROTfOriC9vX-G-j2R8W0fYfy9aIsUcZrIbVCs0/edit#gid=0"> Google spreadsheet</a>. Simply take the next one ready, or ask SzikakA#3853 on Discord if you're unsure. <br>
+					As for Gun_type, current value for <q>Custom</q> action is 2, but that may change later. It's only important for it to be something different than stock values. Let's set it to <span class="background">Automatic</span> for now.
+				</p>
+
+				<p id="model">
+					After adding them to the object, select <span class="background"> Modding</span> -> <span class="background">Set Custom Values</span> on the top strip. Custom scripts should disappear, and the enum values you've changed will appear blank. This is also done automatically when you build AssetBundles. Speaking of...
+				</p>
+			</section>
+
+			<section class="point">
+				<h1 class="point-number"> 6 - Exporting your mod </h1>
+
+				<p>
+					Receiver 2 uses AssetBundle files to load mods. To export assetbundles, select the prefab in the assets menu. On the bottom of the inspector there are two fields labeled <i> AssetBundle</i>. <br>
+					On the left, type in the name of your mod. It's important for it to be unique as you can load only one bundle with the same name. A good idea is to go <span class="background">Your Name</span>-<span class="background">Name of the gun</span>. Then, type <i>windows</i> to the field on the right. If you type something else, the game won't load it.
+				</p>
+
+				<img src="images/bundle.png" title="Example of a configured bundle">
+
+				<p>
+					You can then compile the bundle by selecting <span class="background"> Assets</span> -> <span class="background"> Build AssetBundles</span> from the top stripe. Built bundles can be accessed in <span class="background">AssetBundles</span> folder in the assets menu.
+				</p>
+
+				<img src="images/abundles.png" title="Generated AssetBundles">
+
+				<p>
+					To actually use the gun, create a gun's folder in Receiver 2's Guns directory (<i>%AppData%/LocalLow/Wolfire Games/Receiver2/Guns</i>, easy to access by pressing Win + R and typing in <i>appdata</i>) and copy the .windows file there.
+				</p>
+
+				<img src="images/ready.png" title="Ready assetbundle">
+
+				<p>
+					You can also specify the path that bundles will be copied to after building. To do it, enter <span class="background"> Modding</span> -> <span class="background"> CustomAssetBundleDirectories</span> and change the value of <i>Path</i> field under your assetbundle. Bundles will then be automatically copied to that location after building.
+				</p>
+
+				<img src="images/paths.png" title="Example path">
+			</section>
+
+			<section class="point">
+				<h1 class="point-number"> 7 - BepInEx plugin </h1>
+
+				<p>
+					You can theoretically use the mod right now - simply create a loadout with the correct <i>gun_internal_name</i> and use it in dreaming. But it's not the only option, guns can also be spawned in the compound after all. Making a modded gun spawnable does require a bit of work, however.
+				</p>
+
+				<p>
+					First of all, we have to create a BepInEx project, as that will be our platform of choice. To do it, first create a directory somewhere on your PC to house all BepInEx projects you'll make. Next, open the Command Prompt (search for cmd) and navigate to the cosen folder (use <span class="background">Letter</span>: to navigate between drives, <i>dir</i> to see available folders and cd <span class="background">folder name</span> to move between them (cd.. if you want to go back)) <br>
+					Once you're there, follow the <a href="https://docs.bepinex.dev/v5.4.16/articles/dev_guide/plugin_tutorial/1_setup.html" target="blank"> official installation guide </a> to setup your BeInEx project.
+				</p>
+
+				<p>
+					After creating the project, you should have 3 files in your project's directory
+				</p>
+
+				<img src="images/files.png">
+
+				<p>
+					You can then open <i>Plugin.cs</i> with your editor of choice, I'm going to use Microsoft Visual Studio.
+				</p>
+
+				<img src="images/solution.png">
+
+				<p>
+					There are a lot going on here, it's all explained by the official guide mentioned earlier. What we care for now is that we have to reference some Receiver 2's classes. To do it, let's create a <i>Lib</i> folder and copy the Wolfire.Receiver2.dll from the game files. Then add it to project's dependencies, either by using Visual Studios wizard or by editing the .csproj file.
+				</p>
+
+				<div class="tight">
+					<p>
+						We should now be able to do this:
+					</p>
+
+					<img src="images/using.png">
+
+					<p>
+						Without any errors;
+					</p>
+				</div>
+
+				<p>
+					We can now use BepInEx's Harmony library (referenced by typing in <span class="background">using HarmonyLib</span>) to patch your gun into the spawnmenu.
+				</p>
+
+				<p>
+					Why do we have to do this? Well, guns are loaded from AssetBundles by method <span class="background">ReceiverCoreScript.Awake</span> and into ReceiverCoreScript.gun_prefabs_all array. But we want it in ReceiverCoreScript.generic_prefabs so we can spawn it. Therefore, we'll need a little trick called postfix patching. It basically lets us add extra code to built-in functions, enabling us to do a lot of useful things.
+				</p>
+
+				<p>
+					First, we create a function that will act as a patcher. To do it, we have to include some special attributes.
+				</p>
+
+				<div class="code">
+					[HarmonyPatch(typeof(ReceiverCoreScript), "Awake")] <br>
+					[HarmonyPostfix] <br>
+					private static void PatchCoreAwake() { <br>
+						<br>
+					} <br>
+				</div>
+
+				<p>
+					In this example, [HarmonyPatch] specifies the type and name of the method we'll be patching while [HarmonyPostfix] indicates that our patch will be executed after the original. Now we have to get access to the script and its array. To do it, we add a reference to the instance executing the original method and to gun_prefabs_all array with three _ symbols to indicate that it's a private property.
+				</p>
+
+				<div class="code">
+					[HarmonyPatch(typeof(ReceiverCoreScript), "Awake")] <br>
+					[HarmonyPostfix] <br>
+					private static void PatchCoreAwake(ref ReceiverCoreScript __instance, ref GameObject[] ___gun_prefabs_all) { <br>
+					<br>
+					} <br>
+				</div>
+
+				<p>
+					Now, <i>___gun_prefabs_all</i> contains our gun. We just have  to get it out of there and into <i>generic_prefabs</i>. To do it, a simple way is to use IEnumerable.Single() method from System.Linq with predicate searching for a gun with a gun_model value <a href="#model"> that you assigned</a>, then  add it to <i>generic_prefabs</i>. It helps if a model is assigned to a variable, as you might have to use it later.
+				</p>
+
+				<div class="code">
+					private static int gun_model = 1004; <br>
+					<br>
+					[HarmonyPatch(typeof(ReceiverCoreScript), "Awake")] <br>
+					[HarmonyPostfix] <br>
+					private static void PatchCoreAwake(ref ReceiverCoreScript __instance, ref GameObject[] ___gun_prefabs_all) { <br>
+					&emsp;	GunScript mod = null; <br>
+					&emsp;	<br>
+					&emsp;	mod = ___gun_prefabs_all.Single( gameObject => { <br>
+					&emsp;	&emsp;	return ((int) gameObject.GetComponent&lt;GunScript>().gun_model == gun_model); <br>
+					&emsp;	}).GetComponent&lt;GunScript>(); <br>
+					} <br>
+				</div>
+
+				<p>
+					Unfortunately, since <i>generic_prefabs</i> is a fixed size array we cannot add our modded gun directly. We can however turn the array into a List and add it there, then revert the List to being an array.
+				</p>
+
+				<div class="code" title="Wolfire pls fix">
+					private static int gun_model = 1004; <br>
+					<br>
+					[HarmonyPatch(typeof(ReceiverCoreScript), "Awake")] <br>
+					[HarmonyPostfix] <br>
+					private static void PatchCoreAwake(ref ReceiverCoreScript __instance, ref GameObject[] ___gun_prefabs_all) { <br>
+					&emsp;	GunScript mod = null; <br>
+					&emsp;	<br>
+					&emsp;	mod = ___gun_prefabs_all.Single( gameObject => { <br>
+					&emsp;	&emsp;	return ((int) gameObject.GetComponent&lt;GunScript>().gun_model == gun_model); <br>
+					&emsp;	}).GetComponent&lt;GunScript>(); <br>
+					<br>
+					&emsp;__instance.generic_prefabs = new List<InventoryItem>( __instance.generic_prefabs ) { mod }.ToArray(); <br>
+					} <br>
+				</div>
+
+				<p>
+					After that, all is left is to apply the patch on plugin startup by calling method <i>Harmony.CreateAndPatchAll(Type)</i> with <i>Type</i> being the type of your plugin.
+				</p>
+
+				<div class="tight">
+					<p>
+						Finished code should look similar to that:
+					</p>
+
+					<img src="images/plugin.png">
+				</div>
+
+				<p>
+					Now all that's left to do is to compile the code and move the created dll file to BepInEx's plugins directory (dll will have the same name as the project's namespace).
+				</p>
+
+				<img src="images/plugindll.png" title="Plugin's dll file in it's own folder">
+
+				<p>
+					After that's done, let's launch the game and see what happens!
+				</p>
+
+				<img src="images/ss1.jpg"> <div class="description">That's not how you hold a gun... </div>
+
+				<p>
+					Receiver 2 doesn't know where any gun parts are, including sights. Changes are your mod will not have the correct sight picture. To fix it, we'll have to go back to Unity Editor.
+				</p>
+			</section>
+
+			<section class="point">
+				<h1 class="point-number"> 8 - finishing touches </h1>
+
+				<div class="tight">
+					<p>
+						To correctly position the gun during various actions Receiver 2 uses a system of GameObjects called <q>Poses</q>. They are just objects that are offset to the origin, game then applies this offset to the gun in certain situations. There are 8 poses in total, but the game creates them automatically if you don't, so we can skip ones we don't need.
+					</p>
+					
+					<ul>
+						<li> pose_aim_down_sights - controls the general position of the gun, as well as the sight picture </li>
+						<li> pose_slide_pull - controls the position of a gun when pressing R </li>
+						<li> pose_reload - controls the position of a gun when reloading and when its hammer is dropped </li>
+						<li> pose_press_check - controls the position of a gun when checking the chamber </li>
+						<li> pose_inspect_cylinder - controls the position of a gun when the cylinder is open </li>
+						<li> pose_add_rounds - seems to be unused </li>
+						<li> pose_eject_rounds - controls the position of a gun when the ejecting rounds from a revolver </li>
+						<li> pose_inspect_gun - controls the position of a gun when inspecting it </li>
+					</ul>
+				</div>
+
+				<p>
+					We'll need to set <i> pose_aim_down_sights </i> postition so that sight are roughly at 0 units Y, or right on the grid. Simple way to do it is to lower gun until grid lines go through the sights.
+				</p>
+
+				<img src="images/sights1.png">
+
+				<p>
+					Then copy the position to the pose object. and bring the gun back up.
+				</p>
+
+				<img src="images/sights2.png">
+
+				<p>
+					Now, build the bundle again, copy it and let's check if it did anything.
+				</p>
+
+				<img src="images/ss2.jpg"> <div class="description"> Now that's more like it </div>
+
+				<p>
+					If you've followed that guide, you should now have a debug gun of your own. Congratulations! I will release follow-ups on how to make more complicated things, but for now that's it. You can try messing with it yourself, good luck!
+				</p>
+			</section>
+
+			<section class="point">
+				<h1 class="point-number"> X - additional resources </h1>
+
+				<p>
+					Additional tools that may be useful while creating or debugging your gun:
+				</p>
+
+				<ul>
+					<li> <a href="https://github.com/dnSpy/dnSpy" target="blank"> dnSpy</a> - C# assembly decompiler, useful for determining what things do in the game </li>
+					<li> <a href="https://github.com/sinai-dev/UnityExplorer" target="blank"> UnityExplorer </a> - handy for checking real-time updated values of objects in the game </li>
+					<li> <a href="https://github.com/Szikaka-97/Receiver-2-Modding-Guide" target="blank"> Example Plugin </a> - example gun plugin used in this guide </li>
+				</ul>
+			</section>
+
+			<!--
+			-->
+		</main>
+	</body>
+</html>

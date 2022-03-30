@@ -1,1 +1,1 @@
-﻿This is an example plugin for a Receiver 2 modded gun.
+﻿This is an example BepInEx plugin for a Receiver 2 modded gun.
